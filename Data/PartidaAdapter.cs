@@ -49,7 +49,7 @@ namespace Data
                     newId = maxId.Value + 1;
                 }
 
-                sqlCommand = "Insert into Partida values (@Id, @Nome)";
+                sqlCommand = "Insert into Partida values (@Id, @Time1Id, @Time2Id, @GolsTime1, @GolsTime2, @TorneioId)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
@@ -73,7 +73,9 @@ namespace Data
                 if (partida == null)
                     return InsertPartida(time1Id, time2Id, golsTime1, golsTime2, torneioId);
 
-                sqlCommand = "Update Partida SET Nome = @Nome WHERE Id = @Id";
+                sqlCommand = @"Update Partida SET Time1Id = @Time1Id, Time2Id = @Time2Id, 
+                               GolsTime1 = @GolsTime1, GolsTime2 = @GolsTime2, TorneioId = @TorneioId 
+                              WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", partida.Id, DbType.Int32);

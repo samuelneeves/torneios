@@ -49,7 +49,7 @@ namespace Data
                     newId = maxId.Value + 1;
                 }
 
-                sqlCommand = "Insert into Transferencia values (@Id, @Nome)";
+                sqlCommand = "Insert into Transferencia values (@Id, @TimeOrigemId, @TimeDestinoId, @Data, @Valor, @JogadorId)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
@@ -73,7 +73,9 @@ namespace Data
                 if (transferencia == null)
                     return InsertTransferencia(timeOrigemId, timeDestinoId, data, valor, jogadorId);
 
-                sqlCommand = "Update Transferencia SET Nome = @Nome WHERE Id = @Id";
+                sqlCommand = @"Update Transferencia SET TimeOrigemId = @TimeOrigemId, TimeDestinoId = @TimeDestinoId, 
+                             Data = @Data, Valor = @Valor, JogadorId = @JogadorId 
+                            WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);

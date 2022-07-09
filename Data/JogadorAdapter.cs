@@ -49,7 +49,7 @@ namespace Data
                     newId = maxId.Value + 1;
                 }
 
-                sqlCommand = "Insert into Jogador values (@Id, @Nome)";
+                sqlCommand = "Insert into Jogador values (@Id, @Nome, @DataNascimento, @Pais, @TimeId)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
@@ -72,7 +72,9 @@ namespace Data
                 if (jogador == null)
                     return InsertJogador(nome, dataNascimento, pais, timeId);
 
-                sqlCommand = "Update Jogador SET Nome = @Nome WHERE Id = @Id";
+                sqlCommand = @"Update Jogador SET Nome = @Nome, DataNascimento = @DataNascimento, 
+                                Pais = @Pais, TimeId = @TimeId 
+                              WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);

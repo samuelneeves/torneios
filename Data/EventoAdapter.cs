@@ -74,7 +74,9 @@ namespace Data
                 if (evento == null)
                     return InsertEvento(tipo, valor, dataHora, timeId, jogadorId, partidaId);
 
-                sqlCommand = "Update Evento SET Nome = @Nome WHERE Id = @Id";
+                sqlCommand = @"Update Evento SET Tipo = @Tipo, Valor = @Valor, DataHora = @DataHora, @TimeId = TimeId, 
+                               JogadorId = @JogadorId, PartidaId = @PartidaId 
+                               WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);
