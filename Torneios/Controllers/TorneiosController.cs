@@ -20,5 +20,11 @@ namespace Torneios.Controllers
         {
             return new TorneioAdapter().GetTorneios();
         }
+
+        [HttpPost(Name = "PostTorneio")]
+        public int Post(Torneio torneio)
+        {
+            return new TorneioAdapter().InsertTorneio(torneio);
+        }
     }
 }
