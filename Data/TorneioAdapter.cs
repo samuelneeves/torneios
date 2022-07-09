@@ -11,7 +11,7 @@ using Domain;
 
 namespace Data
 {
-    internal class TorneioAdapter
+    public class TorneioAdapter
     {
         private const string connectionString = "data source=TorneioDB;initial catalog = Torneio; integrated security = True; MultipleActiveResultSets=True;";
 
