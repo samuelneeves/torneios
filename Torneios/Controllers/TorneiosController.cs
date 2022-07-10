@@ -1,6 +1,7 @@
 using Data;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ;
 
 namespace Torneios.Controllers
 {
@@ -61,6 +62,7 @@ namespace Torneios.Controllers
             if (adapter.InsertEvento(tipoEvento, valor, DateTime.Now, null, null, partidaId, id, out newId) > 0)
             {
                 Evento novoEvento = adapter.GetEventoById(newId);
+                Producer.Send(tipoEvento, novoEvento);
                 return CreatedAtAction(nameof(GetById), new { id = novoEvento.Id }, novoEvento);
             }
 
@@ -75,6 +77,7 @@ namespace Torneios.Controllers
             if (adapter.InsertEvento(tipoEvento, valor, DateTime.Now, timeId, null, partidaId, id, out newId) > 0)
             {
                 Evento novoEvento = adapter.GetEventoById(newId);
+                Producer.Send(tipoEvento, novoEvento);
                 return CreatedAtAction(nameof(GetById), new { id = novoEvento.Id }, novoEvento);
             }
 
@@ -89,6 +92,7 @@ namespace Torneios.Controllers
             if (adapter.InsertEvento(tipoEvento, valor, DateTime.Now, timeId, jogadorId, partidaId, id, out newId) > 0)
             {
                 Evento novoEvento = adapter.GetEventoById(newId);
+                Producer.Send(tipoEvento, novoEvento);
                 return CreatedAtAction(nameof(GetById), new { id = novoEvento.Id }, novoEvento);
             }
 

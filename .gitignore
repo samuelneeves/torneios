@@ -15,3 +15,5 @@
 /Torneios/obj
 /Data/obj
 /Domain/obj
+/RabbitMQ/bin/Debug/net6.0
+/RabbitMQ/obj

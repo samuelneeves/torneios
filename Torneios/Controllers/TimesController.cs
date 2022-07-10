@@ -28,14 +28,14 @@ namespace Times.Controllers
         }
 
         [HttpPost(Name = "PostTime")]
-        public ActionResult Post([FromBody] string nome)
+        public ActionResult Post(Time time)
         {
             TimeAdapter adapter = new TimeAdapter();
             int newId;
-            if (adapter.InsertTime(nome, out newId) > 0)
+            if (adapter.InsertTime(time.Nome, time.Localidade, out newId) > 0)
             {
-                Time time = adapter.GetTimeById(newId);
-                return CreatedAtAction(nameof(GetById), new { id = time.Id }, time);
+                Time novoTime = adapter.GetTimeById(newId);
+                return CreatedAtAction(nameof(GetById), new { id = novoTime.Id }, novoTime);
             }
 
             return StatusCode(500);
@@ -47,7 +47,7 @@ namespace Times.Controllers
             if (time == null || time.Id != id)
                 return BadRequest();
 
-            if (new TimeAdapter().UpdateTime(id, time.Nome) > 0)
+            if (new TimeAdapter().UpdateTime(id, time.Nome, time.Localidade) > 0)
                 return Ok();
 
             return StatusCode(500);

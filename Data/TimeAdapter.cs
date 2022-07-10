@@ -36,7 +36,7 @@ namespace Data
             }
         }
 
-        public int InsertTime(string nome, out int newId)
+        public int InsertTime(string nome, string localicade, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -49,17 +49,18 @@ namespace Data
                     newId = maxId.Value + 1;
                 }
 
-                sqlCommand = "Insert into Time values (@Id, @Nome)";
+                sqlCommand = "Insert into Time values (@Id, @Nome, @Localidade)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
+                parameters.Add("Localidade", localicade, DbType.String);
 
                 return connection.Execute(sqlCommand, parameters);
             }
         }
 
-        public int UpdateTime(int id, string nome)
+        public int UpdateTime(int id, string nome, string localidade)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -68,13 +69,14 @@ namespace Data
 
                 int newId;
                 if (time == null)
-                    return InsertTime(nome, out newId);
+                    return InsertTime(nome, localidade, out newId);
 
-                sqlCommand = "Update Time SET Nome = @Nome WHERE Id = @Id";
+                sqlCommand = "Update Time SET Nome = @Nome, Localidade = @Localidade WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", time.Id, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
+                parameters.Add("Localidade", localidade, DbType.String);
 
                 return connection.Execute(sqlCommand, parameters);
             }
