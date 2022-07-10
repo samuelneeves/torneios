@@ -17,3 +17,6 @@
 /Domain/obj
 /RabbitMQ/bin/Debug/net6.0
 /RabbitMQ/obj
+/RabbitMQConsumer/.vs
+/RabbitMQConsumer/RabbitMQConsumer/bin/Debug/net6.0
+/RabbitMQConsumer/RabbitMQConsumer/obj
