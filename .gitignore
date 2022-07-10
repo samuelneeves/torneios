@@ -3,3 +3,9 @@
 ################################################################################
 
 /.vs
+/Data/bin/Debug/net6.0
+/Data/obj/Debug/net6.0/ref
+/Data/obj/Debug/net6.0/refint
+/Domain/bin/Debug/net6.0
+/Domain/obj/Debug/net6.0
+/Torneios/bin/Debug/net6.0/runtimes

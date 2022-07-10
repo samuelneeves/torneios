@@ -13,7 +13,7 @@ namespace Data
 {
     public class TimeAdapter
     {
-        private const string connectionString = "data source=TorneioDB;initial catalog = Time; integrated security = True; MultipleActiveResultSets=True;";
+        private const string connectionString = "server=.\\SQLEXPRESS;Integrated Security=SSPI; database=TorneioDB";
 
         public List<Time> GetTimes()
         {
@@ -36,13 +36,13 @@ namespace Data
             }
         }
 
-        public int InsertTime(string nome)
+        public int InsertTime(string nome, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = "Select MAX(Id) from Time";
                 int? maxId = connection.Query<int?>(sqlCommand).FirstOrDefault();
-                int newId = 1;
+                newId = 1;
                 
                 if (maxId.HasValue)
                 {
@@ -66,8 +66,9 @@ namespace Data
                 var sqlCommand = string.Format("Select * from Time WHERE Id = {0}", id);
                 Time time = connection.QueryFirstOrDefault<Time>(sqlCommand);
 
+                int newId;
                 if (time == null)
-                    return InsertTime(nome);
+                    return InsertTime(nome, out newId);
 
                 sqlCommand = "Update Time SET Nome = @Nome WHERE Id = @Id";
 

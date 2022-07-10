@@ -13,7 +13,7 @@ namespace Data
 {
     public class PartidaAdapter
     {
-        private const string connectionString = "data source=TorneioDB;initial catalog = Partida; integrated security = True; MultipleActiveResultSets=True;";
+        private const string connectionString = "server=.\\SQLEXPRESS;Integrated Security=SSPI; database=TorneioDB";
 
         public List<Partida> GetPartidas()
         {
@@ -36,13 +36,13 @@ namespace Data
             }
         }
 
-        public int InsertPartida(int time1Id, int time2Id, int? golsTime1, int? golsTime2, int? torneioId)
+        public int InsertPartida(int time1Id, int time2Id, int? golsTime1, int? golsTime2, int? torneioId, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = "Select MAX(Id) from Partida";
                 int? maxId = connection.Query<int?>(sqlCommand).FirstOrDefault();
-                int newId = 1;
+                newId = 1;
 
                 if (maxId.HasValue)
                 {
@@ -70,8 +70,9 @@ namespace Data
                 var sqlCommand = string.Format("Select * from Partida WHERE Id = {0}", id);
                 Partida partida = connection.QueryFirstOrDefault<Partida>(sqlCommand);
 
+                int newId;
                 if (partida == null)
-                    return InsertPartida(time1Id, time2Id, golsTime1, golsTime2, torneioId);
+                    return InsertPartida(time1Id, time2Id, golsTime1, golsTime2, torneioId, out newId);
 
                 sqlCommand = @"Update Partida SET Time1Id = @Time1Id, Time2Id = @Time2Id, 
                                GolsTime1 = @GolsTime1, GolsTime2 = @GolsTime2, TorneioId = @TorneioId 

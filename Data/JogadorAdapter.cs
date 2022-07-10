@@ -13,9 +13,9 @@ namespace Data
 {
     public class JogadorAdapter
     {
-        private const string connectionString = "data source=TorneioDB;initial catalog = Jogador; integrated security = True; MultipleActiveResultSets=True;";
+        private const string connectionString = "server=.\\SQLEXPRESS;Integrated Security=SSPI; database=TorneioDB";
 
-        public List<Jogador> GetJogadors()
+        public List<Jogador> GetJogadores()
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -36,13 +36,13 @@ namespace Data
             }
         }
 
-        public int InsertJogador(string nome, DateTime dataNascimento, string pais, int? timeId)
+        public int InsertJogador(string nome, DateTime dataNascimento, string pais, int? timeId, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = "Select MAX(Id) from Jogador";
                 int? maxId = connection.Query<int?>(sqlCommand).FirstOrDefault();
-                int newId = 1;
+                newId = 1;
 
                 if (maxId.HasValue)
                 {
@@ -69,8 +69,9 @@ namespace Data
                 var sqlCommand = string.Format("Select * from Jogador WHERE Id = {0}", id);
                 Jogador jogador = connection.QueryFirstOrDefault<Jogador>(sqlCommand);
 
+                int newId;
                 if (jogador == null)
-                    return InsertJogador(nome, dataNascimento, pais, timeId);
+                    return InsertJogador(nome, dataNascimento, pais, timeId, out newId);
 
                 sqlCommand = @"Update Jogador SET Nome = @Nome, DataNascimento = @DataNascimento, 
                                 Pais = @Pais, TimeId = @TimeId 

@@ -11,9 +11,9 @@ using Domain;
 
 namespace Data
 {
-    internal class TransferenciaAdapter
+    public class TransferenciaAdapter
     {
-        private const string connectionString = "data source=TorneioDB;initial catalog = Transferencia; integrated security = True; MultipleActiveResultSets=True;";
+        private const string connectionString = "server=.\\SQLEXPRESS;Integrated Security=SSPI; database=TorneioDB";
 
         public List<Transferencia> GetTransferencias()
         {
@@ -36,13 +36,13 @@ namespace Data
             }
         }
 
-        public int InsertTransferencia(int? timeOrigemId, int? timeDestinoId, DateTime data, double valor, int jogadorId)
+        public int InsertTransferencia(int? timeOrigemId, int? timeDestinoId, DateTime data, double valor, int jogadorId, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = "Select MAX(Id) from Transferencia";
                 int? maxId = connection.Query<int?>(sqlCommand).FirstOrDefault();
-                int newId = 1;
+                newId = 1;
 
                 if (maxId.HasValue)
                 {
@@ -63,15 +63,16 @@ namespace Data
             }
         }
 
-        public int UpdateTransferencia(int id, int? timeOrigemId, int? timeDestinoId, DateTime data, double valor, int jogadorId)
+        public int UpdateTransferencia(int id, int? timeOrigemId, int? timeDestinoId, DateTime? data, double? valor, int jogadorId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = string.Format("Select * from Transferencia WHERE Id = {0}", id);
                 Transferencia transferencia = connection.QueryFirstOrDefault<Transferencia>(sqlCommand);
 
+                int newId;
                 if (transferencia == null)
-                    return InsertTransferencia(timeOrigemId, timeDestinoId, data, valor, jogadorId);
+                    return InsertTransferencia(timeOrigemId, timeDestinoId, data ?? DateTime.Now, valor ?? 0, jogadorId, out newId);
 
                 sqlCommand = @"Update Transferencia SET TimeOrigemId = @TimeOrigemId, TimeDestinoId = @TimeDestinoId, 
                              Data = @Data, Valor = @Valor, JogadorId = @JogadorId 
@@ -81,7 +82,7 @@ namespace Data
                 parameters.Add("Id", id, DbType.Int32);
                 parameters.Add("TimeOrigemId", timeOrigemId, DbType.Int32);
                 parameters.Add("TimeDestinoId", timeDestinoId, DbType.Int32);
-                parameters.Add("Data", data, DbType.DateTime);
+                parameters.Add("Data", data ?? transferencia.Data ?? DateTime.Now, DbType.DateTime);
                 parameters.Add("Valor", valor, DbType.Double);
                 parameters.Add("JogadorId", jogadorId, DbType.Int32);
 

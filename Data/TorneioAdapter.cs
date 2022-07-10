@@ -13,7 +13,7 @@ namespace Data
 {
     public class TorneioAdapter
     {
-        private const string connectionString = "data source=TorneioDB;initial catalog = Torneio; integrated security = True; MultipleActiveResultSets=True;";
+        private const string connectionString = "server=.\\SQLEXPRESS;Integrated Security=SSPI; database=TorneioDB";
 
         public List<Torneio> GetTorneios()
         {
@@ -36,13 +36,13 @@ namespace Data
             }
         }
 
-        public int InsertTorneio(string nome)
+        public int InsertTorneio(string nome, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sqlCommand = "Select MAX(Id) from Torneio";
                 int? maxId = connection.Query<int?>(sqlCommand).FirstOrDefault();
-                int newId = 1;
+                newId = 1;
 
                 if (maxId.HasValue)
                 {
@@ -88,8 +88,9 @@ namespace Data
                 var sqlCommand = string.Format("Select * from Torneio WHERE Id = {0}", id);
                 Torneio torneio = connection.QueryFirstOrDefault<Torneio>(sqlCommand);
 
+                int newId;
                 if (torneio == null)
-                    return InsertTorneio(nome);
+                    return InsertTorneio(nome, out newId);
 
                 sqlCommand = "Update Torneio SET Nome = @Nome WHERE Id = @Id";
 
