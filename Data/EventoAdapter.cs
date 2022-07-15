@@ -88,7 +88,35 @@ namespace Data
                 parameters.Add("TimeId", timeId, DbType.Int32);
                 parameters.Add("JogadorId", jogadorId, DbType.Int32);
                 parameters.Add("PartidaId", partidaId, DbType.Int32);
-                parameters.Add("TorneioId", partidaId, DbType.Int32);
+                parameters.Add("TorneioId", torneioId, DbType.Int32);
+
+                return connection.Execute(sqlCommand, parameters);
+            }
+        }
+
+        public int UpdateEvento(int id, string? tipo, string? valor, DateTime? dataHora, int? timeId, int? jogadorId, int? partidaId, int? torneioId, bool updateParcial)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlCommand = string.Format("Select * from Evento WHERE Id = {0}", id);
+                Evento evento = connection.QueryFirstOrDefault<Evento>(sqlCommand);
+
+                if (evento == null)
+                    return -1;
+
+                sqlCommand = @"Update Evento SET Tipo = @Tipo, Valor = @Valor, DataHora = @DataHora, @TimeId = TimeId, 
+                               JogadorId = @JogadorId, PartidaId = @PartidaId, @TorneioId = TorneioId
+                               WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Int32);
+                parameters.Add("Tipo", updateParcial && !string.IsNullOrEmpty(tipo) ? tipo : evento.Tipo, DbType.String);
+                parameters.Add("Valor", updateParcial && !string.IsNullOrEmpty(valor) ? valor : evento.Valor, DbType.String);
+                parameters.Add("DataHora", updateParcial && dataHora.HasValue ? dataHora : evento.DataHora, DbType.DateTime); ;
+                parameters.Add("TimeId", updateParcial && timeId.HasValue ? timeId : evento.TimeId, DbType.Int32);
+                parameters.Add("JogadorId", updateParcial && jogadorId.HasValue ? jogadorId : evento.JogadorId, DbType.Int32);
+                parameters.Add("PartidaId", updateParcial && partidaId.HasValue ? partidaId : evento.PartidaId, DbType.Int32);
+                parameters.Add("TorneioId", updateParcial && torneioId.HasValue ? torneioId : evento.TorneioId, DbType.Int32);
 
                 return connection.Execute(sqlCommand, parameters);
             }

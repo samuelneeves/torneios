@@ -54,8 +54,8 @@ namespace Data
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
-                parameters.Add("DataNascimento", nome, DbType.DateTime);
-                parameters.Add("Pais", nome, DbType.String);
+                parameters.Add("DataNascimento", dataNascimento, DbType.DateTime);
+                parameters.Add("Pais", pais, DbType.String);
                 parameters.Add("TimeId", timeId, DbType.Int32);
 
                 return connection.Execute(sqlCommand, parameters);
@@ -80,9 +80,34 @@ namespace Data
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
-                parameters.Add("DataNascimento", nome, DbType.DateTime);
-                parameters.Add("Pais", nome, DbType.String);
+                parameters.Add("DataNascimento", dataNascimento, DbType.DateTime);
+                parameters.Add("Pais", pais, DbType.String);
                 parameters.Add("TimeId", timeId, DbType.Int32);
+
+                return connection.Execute(sqlCommand, parameters);
+            }
+        }
+
+        public int UpdateJogador(int id, string? nome, DateTime? dataNascimento, string? pais, int? timeId)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlCommand = string.Format("Select * from Jogador WHERE Id = {0}", id);
+                Jogador jogador = connection.QueryFirstOrDefault<Jogador>(sqlCommand);
+
+                if (jogador == null)
+                    return -1;
+
+                sqlCommand = @"Update Jogador SET Nome = @Nome, DataNascimento = @DataNascimento, 
+                                Pais = @Pais, TimeId = @TimeId 
+                              WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Int32);
+                parameters.Add("Nome", nome ?? jogador.Nome, DbType.String);
+                parameters.Add("DataNascimento", dataNascimento ?? jogador.DataNascimento, DbType.DateTime);
+                parameters.Add("Pais", pais ?? jogador.Pais, DbType.String);
+                parameters.Add("TimeId", timeId ?? jogador.TimeId, DbType.Int32);
 
                 return connection.Execute(sqlCommand, parameters);
             }

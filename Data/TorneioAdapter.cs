@@ -80,7 +80,6 @@ namespace Data
                 return connection.Execute(sqlCommand, parameters);
             }
         }
-
         public int UpdateTorneio(int id, string nome)
         {
             using (var connection = new SqlConnection(connectionString))
@@ -97,6 +96,26 @@ namespace Data
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", torneio.Id, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
+
+                return connection.Execute(sqlCommand, parameters);
+            }
+        }
+
+        public int UpdateTorneio(int id, string? nome, bool updateParcial)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlCommand = string.Format("Select * from Torneio WHERE Id = {0}", id);
+                Torneio torneio = connection.QueryFirstOrDefault<Torneio>(sqlCommand);
+
+                if (torneio == null)
+                    return -1;
+
+                sqlCommand = "Update Torneio SET Nome = @Nome WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", torneio.Id, DbType.Int32);
+                parameters.Add("Nome", updateParcial && !string.IsNullOrEmpty(nome) ? nome : torneio.Nome, DbType.String);
 
                 return connection.Execute(sqlCommand, parameters);
             }

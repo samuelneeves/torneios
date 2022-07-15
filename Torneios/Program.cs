@@ -43,19 +43,7 @@ builder.Services.AddSwaggerGen(s =>
 });
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-builder.Services.AddAuthentication(o =>
-{
-    o.DefaultScheme = IdentityServerAuthenticationDefaults.AuthenticationScheme;
-    o.DefaultAuthenticateScheme = IdentityServerAuthenticationDefaults.AuthenticationScheme;
-}).AddIdentityServerAuthentication(options =>
-                {
-                    options.Authority = "http://jpproject-sso:5000";
-                    options.RequireHttpsMetadata = false;
-                    options.ApiSecret = "api-secret";
-                    options.ApiName = "report-api";
-                    options.RoleClaimType = JwtClaimTypes.Role;
-                    options.NameClaimType = JwtClaimTypes.Name;
-                });
+builder.Services.AddMemoryCache();
 
 
 var app = builder.Build();

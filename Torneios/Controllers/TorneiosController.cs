@@ -1,6 +1,7 @@
 using Data;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using RabbitMQ;
 
 namespace Torneios.Controllers
@@ -9,23 +10,43 @@ namespace Torneios.Controllers
     [Route("torneios")]
     public class TorneiosController : ControllerBase
     {
+        private readonly MemoryCacheEntryOptions opcoesCache = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpiration = DateTime.Now.AddMinutes(5),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Size = 1024
+        };
+
+        private IMemoryCache _memoryCache;
         private readonly ILogger<TorneiosController> _logger;
 
-        public TorneiosController(ILogger<TorneiosController> logger)
+        public TorneiosController(ILogger<TorneiosController> logger, IMemoryCache memoryCache)
         {
             _logger = logger;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet(Name = "GetTorneios")]
         public ActionResult<IEnumerable<Torneio>> Get()
         {
-            return new TorneioAdapter().GetTorneios();
+            if (!_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios) || torneios.Count == 0)
+            {
+                torneios = new TorneioAdapter().GetTorneios();
+                _memoryCache.Set("Torneios", torneios, opcoesCache);
+            }
+            return torneios;
         }
 
         [HttpGet("{id}")]
         public ActionResult<Torneio> GetById(int id)
         {
-            return new TorneioAdapter().GetTorneioById(id);
+            Torneio? torneio = null;
+            if (_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios))
+            {
+                torneio = torneios.FirstOrDefault(j => j.Id == id);
+            }
+
+            return torneio ?? new TorneioAdapter().GetTorneioById(id);
         }
 
         [HttpPost(Name = "PostTorneio")]
@@ -36,6 +57,14 @@ namespace Torneios.Controllers
             if (adapter.InsertTorneio(nome, out newId) > 0)
             {
                 Torneio novoTorneio = adapter.GetTorneioById(newId);
+                if (_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios))
+                {
+                    if (torneios.Count > 0)
+                    {
+                        torneios.Add(novoTorneio);
+                        _memoryCache.Set("Torneios", torneios, opcoesCache);
+                    }
+                }
                 return CreatedAtAction(nameof(GetById), new { id = novoTorneio.Id }, novoTorneio);
             }
 
@@ -48,10 +77,67 @@ namespace Torneios.Controllers
             if (torneio == null || torneio.Id != id)
                 return BadRequest();
 
-            if (new TorneioAdapter().UpdateTorneio(torneio) > 0)
+            int insert = new TorneioAdapter().UpdateTorneio(torneio);
+            if (insert == -1)
+            {
+                return NotFound();
+            }
+            else if (insert > 0)
+            {
+                if (_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios))
+                {
+                    if (torneios.Count > 0)
+                    {
+                        torneios = torneios.Where(j => j.Id != torneio.Id).ToList();
+                        torneios.Add(torneio);
+                        _memoryCache.Set("Torneios", torneios, opcoesCache);
+                    }
+                }
                 return Ok();
+            }
 
             return StatusCode(500);
+        }
+
+        [HttpPatch("{id}")]
+        public ActionResult Patch(int id, string? nome)
+        {
+            TorneioAdapter adapter = new TorneioAdapter();
+            if (adapter.UpdateTorneio(id, nome, true) > 0)
+            {
+                if (_memoryCache.TryGetValue("Torneioes", out List<Torneio> torneios))
+                {
+                    if (torneios.Count > 0)
+                    {
+                        torneios = torneios.Where(j => j.Id != id).ToList();
+                        Torneio torneio = adapter.GetTorneioById(id);
+                        torneios.Add(torneio);
+                        _memoryCache.Set("Torneioes", torneios, opcoesCache);
+                    }
+                }
+                return Ok();
+            }
+
+            return StatusCode(500);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            if (new TorneioAdapter().DeleteTorneio(id) > 0)
+            {
+                if (_memoryCache.TryGetValue("Torneioes", out List<Torneio> torneios))
+                {
+                    if (torneios.Count > 0)
+                    {
+                        torneios = torneios.Where(j => j.Id != id).ToList();
+                        _memoryCache.Set("Torneioes", torneios, opcoesCache);
+                    }
+                }
+                return Ok();
+            }
+
+            return NotFound();
         }
 
         [HttpPost("{id}/partidas/{partidaId}/eventos/{tipoEvento}")]

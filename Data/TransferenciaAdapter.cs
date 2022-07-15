@@ -90,6 +90,32 @@ namespace Data
             }
         }
 
+        public int UpdateTransferencia(int id, int? timeOrigemId, int? timeDestinoId, DateTime? data, double? valor, int? jogadorId)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlCommand = string.Format("Select * from Transferencia WHERE Id = {0}", id);
+                Transferencia transferencia = connection.QueryFirstOrDefault<Transferencia>(sqlCommand);
+
+                if (transferencia == null)
+                    return -1;
+
+                sqlCommand = @"Update Transferencia SET TimeOrigemId = @TimeOrigemId, TimeDestinoId = @TimeDestinoId, 
+                             Data = @Data, Valor = @Valor, JogadorId = @JogadorId 
+                            WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Int32);
+                parameters.Add("TimeOrigemId", timeOrigemId ?? transferencia.TimeOrigemId, DbType.Int32);
+                parameters.Add("TimeDestinoId", timeDestinoId ?? transferencia.TimeDestinoId, DbType.Int32);
+                parameters.Add("Data", data ?? transferencia.Data, DbType.DateTime);
+                parameters.Add("Valor", valor ?? transferencia.Valor, DbType.Double);
+                parameters.Add("JogadorId", jogadorId ?? transferencia.Valor, DbType.Int32);
+
+                return connection.Execute(sqlCommand, parameters);
+            }
+        }
+
         public int DeleteTransferencia(int id)
         {
             using (var connection = new SqlConnection(connectionString))

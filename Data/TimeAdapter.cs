@@ -82,6 +82,28 @@ namespace Data
             }
         }
 
+        public int UpdateTime(int id, string? nome, string? localidade, bool updateParcial)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlCommand = string.Format("Select * from Time WHERE Id = {0}", id);
+                Time time = connection.QueryFirstOrDefault<Time>(sqlCommand);
+
+                int newId;
+                if (time == null)
+                    return -1;
+
+                sqlCommand = "Update Time SET Nome = @Nome, Localidade = @Localidade WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", time.Id, DbType.Int32);
+                parameters.Add("Nome", updateParcial && !string.IsNullOrEmpty(nome) ? nome : time.Nome, DbType.String);
+                parameters.Add("Localidade", updateParcial && !string.IsNullOrEmpty(localidade) ? localidade : time.Localidade, DbType.String);
+
+                return connection.Execute(sqlCommand, parameters);
+            }
+        }
+
         public int DeleteTime(int id)
         {
             using (var connection = new SqlConnection(connectionString))
