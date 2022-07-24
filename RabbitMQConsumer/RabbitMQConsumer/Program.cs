@@ -6,7 +6,7 @@ var factory = new ConnectionFactory() { HostName = "localhost" };
 using (var connection = factory.CreateConnection())
 using (var channel = connection.CreateModel())
 {
-    channel.QueueDeclare(queue: "teste",
+    channel.QueueDeclare(queue: "gol",
                          durable: false,
                          exclusive: false,
                          autoDelete: false,
@@ -19,10 +19,10 @@ using (var channel = connection.CreateModel())
         var message = Encoding.UTF8.GetString(body);
         Console.WriteLine(" [x] Received {0}", message);
     };
-    channel.BasicConsume(queue: "teste",
+    channel.BasicConsume(queue: "gol",
                          autoAck: true,
                          consumer: consumer);
 
-    Console.WriteLine(" Press [enter] to exit.");
+    Console.WriteLine("Aguardando Evento");
     Console.ReadLine();
 }

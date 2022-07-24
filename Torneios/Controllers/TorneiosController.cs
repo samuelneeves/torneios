@@ -105,14 +105,14 @@ namespace Torneios.Controllers
             TorneioAdapter adapter = new TorneioAdapter();
             if (adapter.UpdateTorneio(id, nome, true) > 0)
             {
-                if (_memoryCache.TryGetValue("Torneioes", out List<Torneio> torneios))
+                if (_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios))
                 {
                     if (torneios.Count > 0)
                     {
                         torneios = torneios.Where(j => j.Id != id).ToList();
                         Torneio torneio = adapter.GetTorneioById(id);
                         torneios.Add(torneio);
-                        _memoryCache.Set("Torneioes", torneios, opcoesCache);
+                        _memoryCache.Set("Torneios", torneios, opcoesCache);
                     }
                 }
                 return Ok();
@@ -126,12 +126,12 @@ namespace Torneios.Controllers
         {
             if (new TorneioAdapter().DeleteTorneio(id) > 0)
             {
-                if (_memoryCache.TryGetValue("Torneioes", out List<Torneio> torneios))
+                if (_memoryCache.TryGetValue("Torneios", out List<Torneio> torneios))
                 {
                     if (torneios.Count > 0)
                     {
                         torneios = torneios.Where(j => j.Id != id).ToList();
-                        _memoryCache.Set("Torneioes", torneios, opcoesCache);
+                        _memoryCache.Set("Torneios", torneios, opcoesCache);
                     }
                 }
                 return Ok();

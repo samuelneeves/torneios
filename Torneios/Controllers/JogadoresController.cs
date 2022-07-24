@@ -53,7 +53,7 @@ namespace Jogadores.Controllers
         {
             JogadorAdapter adapter = new JogadorAdapter();
             int newId;
-            if (adapter.InsertJogador(jogador.Nome, jogador.DataNascimento, jogador.Pais, jogador.TimeId, out newId) > 0)
+            if (adapter.InsertJogador(jogador.Nome, jogador.Idade, jogador.Pais, jogador.TimeId, out newId) > 0)
             {
                 Jogador novoJogador = adapter.GetJogadorById(newId);
                 if (_memoryCache.TryGetValue("Jogadores", out List<Jogador> jogadores))
@@ -75,7 +75,7 @@ namespace Jogadores.Controllers
         {
             if (jogador == null || jogador.Id != id)
                 return BadRequest();
-            int insert = new JogadorAdapter().UpdateJogador(id, jogador.Nome, jogador.DataNascimento, jogador.Pais, jogador.TimeId);
+            int insert = new JogadorAdapter().UpdateJogador(id, jogador.Nome, jogador.Idade, jogador.Pais, jogador.TimeId);
             if (insert == -1)
             {
                 return NotFound();
@@ -98,10 +98,10 @@ namespace Jogadores.Controllers
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch(int id, string? nome, DateTime? dataNascimaneto, string? pais, int? timeId)
+        public ActionResult Patch(int id, string? nome, int? idade, string? pais, int? timeId)
         {
             JogadorAdapter adapter = new JogadorAdapter();
-            if (adapter.UpdateJogador(id, nome, dataNascimaneto, pais, timeId) > 0)
+            if (adapter.UpdateJogador(id, nome, idade, pais, timeId) > 0)
             {
                 if (_memoryCache.TryGetValue("Jogadores", out List<Jogador> jogadores))
                 {

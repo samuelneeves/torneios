@@ -36,7 +36,7 @@ namespace Data
             }
         }
 
-        public int InsertJogador(string nome, DateTime dataNascimento, string pais, int? timeId, out int newId)
+        public int InsertJogador(string nome, int idade, string pais, int? timeId, out int newId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -49,12 +49,12 @@ namespace Data
                     newId = maxId.Value + 1;
                 }
 
-                sqlCommand = "Insert into Jogador values (@Id, @Nome, @DataNascimento, @Pais, @TimeId)";
+                sqlCommand = "Insert into Jogador values (@Id, @Nome, @Idade, @Pais, @TimeId)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", newId, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
-                parameters.Add("DataNascimento", dataNascimento, DbType.DateTime);
+                parameters.Add("Idade", idade, DbType.Int32);
                 parameters.Add("Pais", pais, DbType.String);
                 parameters.Add("TimeId", timeId, DbType.Int32);
 
@@ -62,7 +62,7 @@ namespace Data
             }
         }
 
-        public int UpdateJogador(int id, string nome, DateTime dataNascimento, string pais, int? timeId)
+        public int UpdateJogador(int id, string nome, int idade, string pais, int? timeId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -71,16 +71,16 @@ namespace Data
 
                 int newId;
                 if (jogador == null)
-                    return InsertJogador(nome, dataNascimento, pais, timeId, out newId);
+                    return InsertJogador(nome, idade, pais, timeId, out newId);
 
-                sqlCommand = @"Update Jogador SET Nome = @Nome, DataNascimento = @DataNascimento, 
+                sqlCommand = @"Update Jogador SET Nome = @Nome, Idade = @Idade, 
                                 Pais = @Pais, TimeId = @TimeId 
                               WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);
                 parameters.Add("Nome", nome, DbType.String);
-                parameters.Add("DataNascimento", dataNascimento, DbType.DateTime);
+                parameters.Add("Idade", idade, DbType.Int32);
                 parameters.Add("Pais", pais, DbType.String);
                 parameters.Add("TimeId", timeId, DbType.Int32);
 
@@ -88,7 +88,7 @@ namespace Data
             }
         }
 
-        public int UpdateJogador(int id, string? nome, DateTime? dataNascimento, string? pais, int? timeId)
+        public int UpdateJogador(int id, string? nome, int? idade, string? pais, int? timeId)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -98,14 +98,14 @@ namespace Data
                 if (jogador == null)
                     return -1;
 
-                sqlCommand = @"Update Jogador SET Nome = @Nome, DataNascimento = @DataNascimento, 
+                sqlCommand = @"Update Jogador SET Nome = @Nome, Idade = @Idade, 
                                 Pais = @Pais, TimeId = @TimeId 
                               WHERE Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", id, DbType.Int32);
                 parameters.Add("Nome", nome ?? jogador.Nome, DbType.String);
-                parameters.Add("DataNascimento", dataNascimento ?? jogador.DataNascimento, DbType.DateTime);
+                parameters.Add("Idade", idade ?? jogador.Idade, DbType.Int32);
                 parameters.Add("Pais", pais ?? jogador.Pais, DbType.String);
                 parameters.Add("TimeId", timeId ?? jogador.TimeId, DbType.Int32);
 
